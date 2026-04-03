@@ -1,0 +1,25 @@
+[package]
+name = "circom-proof-schema"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.87"
+authors = ["TACEO GmbH <hello@taceo.io>"]
+homepage = "https://www.taceo.io"
+repository = "https://github.com/TaceoLabs/circom_proof_schema"
+license = "MIT OR Apache-2.0"
+publish = false
+readme = "./README.md"
+
+[dependencies]
+ark-circom = { git = "https://github.com/TaceoLabs/circom-compat.git", rev = "7f178fd", version = "^0.5.0", default-features = false, features = [
+    "r1cs_file",
+] }
+ark-ec = "^0.5.0"
+ark-ff = "^0.5.0"
+ark-groth16 = "^0.5.0"
+ark-poly = "^0.5.0"
+ark-relations = "^0.5.0"
+co-circom = { git = "https://github.com/TaceoLabs/co-snarks", rev = "5454c3e", version = "0.10.0" }
+eyre = "0.6.12"
+rand = "0.8.5"
+rayon = "1.9.0"
