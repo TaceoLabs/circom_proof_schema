@@ -3,7 +3,7 @@ pub mod proving_key;
 
 use ark_ff::PrimeField;
 use ark_poly::EvaluationDomain;
-use ark_relations::r1cs::SynthesisError;
+use ark_relations::gr1cs::SynthesisError;
 use rayon::iter::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator};
 
 pub(crate) fn h_query_scalars_libsnark<F: PrimeField>(

@@ -1,12 +1,11 @@
-use ark_circom::circom::R1CSFile;
 use ark_ec::pairing::Pairing;
 use ark_ff::Zero;
 use ark_groth16::Proof;
 use ark_poly::{EvaluationDomain, GeneralEvaluationDomain};
-use ark_relations::r1cs::{ConstraintMatrices, SynthesisError};
+use ark_relations::gr1cs::SynthesisError;
 use co_circom::{
     CircomArkworksPairingBridge, CoCircomCompiler, CoCircomCompilerParsed, CompilerConfig,
-    ProvingKey,
+    ConstraintMatrices, ProvingKey, R1CS,
 };
 
 use eyre::Context;
@@ -46,12 +45,10 @@ where
         CoCircomCompiler::<P>::parse(path, compiler_config).context("while parsing circuit file")
     }
 
-    fn rc1s_to_constraint_matrix(
-        r1cs: R1CSFile<P::ScalarField>,
-    ) -> ConstraintMatrices<P::ScalarField> {
-        let num_constraints = r1cs.header.n_constraints as usize;
-        let num_public_inputs = r1cs.header.n_pub_in as usize + r1cs.header.n_pub_out as usize + 1;
-        let num_witnesses = r1cs.header.n_wires as usize;
+    fn rc1s_to_constraint_matrix(r1cs: R1CS<P>) -> ConstraintMatrices<P::ScalarField> {
+        let num_constraints = r1cs.n_constraints;
+        let num_public_inputs = r1cs.num_inputs;
+        let num_witnesses = r1cs.num_variables;
         let mut a_num_non_zero = 0;
         let mut b_num_non_zero = 0;
         let mut c_num_non_zero = 0;
@@ -102,7 +99,7 @@ where
     }
 
     pub fn from_r1cs_libsnark<R: Rng + CryptoRng>(
-        r1cs: R1CSFile<P::ScalarField>,
+        r1cs: R1CS<P>,
         rng: &mut R,
     ) -> eyre::Result<Self> {
         let matrices = Self::rc1s_to_constraint_matrix(r1cs);
@@ -115,12 +112,12 @@ where
         rng: &mut R,
     ) -> eyre::Result<Self> {
         let file = File::open(path)?;
-        let r1cs = R1CSFile::<P::ScalarField>::new(file).context("while reading r1cs file")?;
+        let r1cs = R1CS::<P>::from_reader(file).context("while reading r1cs file")?;
         Self::from_r1cs_libsnark(r1cs, rng)
     }
 
     pub fn from_r1cs_circom<R: Rng + CryptoRng>(
-        r1cs: R1CSFile<P::ScalarField>,
+        r1cs: R1CS<P>,
         rng: &mut R,
     ) -> eyre::Result<Self> {
         let matrices = Self::rc1s_to_constraint_matrix(r1cs);
@@ -133,7 +130,7 @@ where
         rng: &mut R,
     ) -> eyre::Result<Self> {
         let file = File::open(path)?;
-        let r1cs = R1CSFile::<P::ScalarField>::new(file).context("while reading r1cs file")?;
+        let r1cs = R1CS::<P>::from_reader(file).context("while reading r1cs file")?;
         Self::from_r1cs_circom(r1cs, rng)
     }
 
