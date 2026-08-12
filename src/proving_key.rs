@@ -2,7 +2,7 @@ use ark_ec::{CurveGroup, pairing::Pairing, scalar_mul::BatchMulPreprocessing};
 use ark_ff::{Field, PrimeField, UniformRand, Zero};
 use ark_groth16::VerifyingKey;
 use ark_poly::GeneralEvaluationDomain;
-use ark_relations::r1cs::SynthesisError;
+use ark_relations::gr1cs::SynthesisError;
 use co_circom::ProvingKey;
 use rand::{CryptoRng, Rng};
 
@@ -31,7 +31,7 @@ pub fn generate_proving_key_libsnark<P: Pairing, R: Rng + CryptoRng>(
     let g1_generator = P::G1::rand(rng);
     let g2_generator = P::G2::rand(rng);
 
-    let delta_inverse = delta.inverse().ok_or(SynthesisError::UnexpectedIdentity)?;
+    let delta_inverse = delta.inverse().ok_or(SynthesisError::DivisionByZero)?;
     let h_scalars = super::h_query_scalars_libsnark(qap.m_raw - 1, t, qap.zt, delta_inverse)?;
 
     generate_proving_key_with_randomness(
@@ -65,7 +65,7 @@ pub fn generate_proving_key_circom<P: Pairing, R: Rng + CryptoRng>(
     let g1_generator = P::G1::rand(rng);
     let g2_generator = P::G2::rand(rng);
 
-    let delta_inverse = delta.inverse().ok_or(SynthesisError::UnexpectedIdentity)?;
+    let delta_inverse = delta.inverse().ok_or(SynthesisError::DivisionByZero)?;
     let h_scalars = super::h_query_scalars_circom::<P::ScalarField, D<P::ScalarField>>(
         qap.m_raw - 1,
         t,
@@ -119,8 +119,8 @@ pub fn generate_proving_key_with_randomness<P: Pairing>(
         .map(|i| usize::from(!qap.b[i].is_zero()))
         .sum();
 
-    let gamma_inverse = gamma.inverse().ok_or(SynthesisError::UnexpectedIdentity)?;
-    let delta_inverse = delta.inverse().ok_or(SynthesisError::UnexpectedIdentity)?;
+    let gamma_inverse = gamma.inverse().ok_or(SynthesisError::DivisionByZero)?;
+    let delta_inverse = delta.inverse().ok_or(SynthesisError::DivisionByZero)?;
 
     let gamma_abc = qap.a[..num_instance_variables]
         .iter()
