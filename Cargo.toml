@@ -16,7 +16,7 @@ ark-ff = "^0.6.0"
 ark-groth16 = "^0.6.0"
 ark-poly = "^0.6.0"
 ark-relations = "^0.6.0"
-co-circom = { git = "https://github.com/TaceoLabs/co-snarks", rev = "b95c341ca5bf3b56fb0ea99fff7b31621a9ae197", version = "0.10.0" }
+co-circom = { git = "https://github.com/TaceoLabs/co-snarks", rev = "0252321cde491082854ef976fc45264d5a7eadab", version = "0.10.0" }
 eyre = "0.6.12"
 rand = "0.8.5"
 rayon = "1.9.0"
